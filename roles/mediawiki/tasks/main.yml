@@ -1,0 +1,60 @@
+---
+- name: Install dependencies
+  yum: name={{ item }} state=present
+  with_items:
+    - httpd
+    - mariadb
+    - mariadb-server
+    - php
+    - php-pear
+    - php-pdo
+    - php-xml
+    - php-mysql
+    - php-intl
+    - php-gd
+    - php-mbstring
+    - texlive
+    - ImageMagick-perl
+    - wget
+
+- name: Download MediaWiki
+  get_url:
+    url: http://releases.wikimedia.org/mediawiki/1.34/mediawiki-1.34.2.tar.gz
+    dest: /tmp/mediawiki.tgz
+
+- name: Unarchive MediaWiki
+  unarchive:
+    src: /tmp/mediawiki.tgz
+    dest: /tmp
+    owner: "{{ wiki.user }}"
+    group: "{{ wiki.user }}"
+
+- name: Moving MediaWiki to web directory
+  command: creates={{ wiki.install_path }} mv /tmp/mediawiki-1.34.2/ {{ wiki.install_path }}
+
+- name: Setting up /wiki endpoint and securing wiki from IP address scanning
+  template:
+    src: wiki.conf.j2
+    dest: /etc/httpd/conf.d/wiki.conf
+    owner: "{{ wiki.user }}"
+    group: "{{ wiki.user }}"
+    mode: 0664
+
+
+
+- name: Updating permissions on MediaWiki installation parent directory
+  file:
+    path: "{{ wiki.install_path }}/.."
+    state: directory
+    owner: "{{ wiki.user }}"
+    group: "{{ wiki.user }}"
+    mode: 0775
+
+- name: Updating permissions on MediaWiki installation
+  file:
+    path: "{{ wiki.install_path }}"
+    state: directory
+    recurse: yes
+    owner: "{{ wiki.user }}"
+    group: "{{ wiki.user }}"
+    mode: 0775
