@@ -58,3 +58,23 @@
     owner: "{{ wiki.user }}"
     group: "{{ wiki.user }}"
     mode: 0775
+
+- name: Start service httpd, if not running
+  service:
+    name: httpd
+    state: started
+
+- name: Enable service httpd
+  service:
+    name: httpd
+    enabled: yes
+
+- name: Start service mariadb, if not running
+  service:
+    name: mariadb
+    state: started
+
+- name: Enable service mariadb
+  service:
+    name: mariadb
+    enabled: yes
