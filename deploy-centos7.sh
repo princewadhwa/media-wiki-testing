@@ -5,4 +5,4 @@ yum -y install epel-release
 yum -y install ansible
 
 # run ansible
-#ansible-playbook -i aws site.yml --extra-vars "$@"
+ansible-playbook -i inventory site.yml -vvvv
